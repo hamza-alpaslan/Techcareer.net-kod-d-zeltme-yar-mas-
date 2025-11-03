@@ -53,7 +53,7 @@ public class RegistrationManager : IRegistrationService
         }
 
         // KOLAY: Noktalı virgül eksikliği
-        return new ErrorResult(ConstantsMessages.RegistrationCreateFailedMessage) // TYPO: ; eksik
+        return new ErrorResult(ConstantsMessages.RegistrationCreateFailedMessage); // TYPO: ; eksik
     }
 
     public async Task<IResult> Remove(DeleteRegistrationDto entity)
@@ -115,6 +115,6 @@ public class RegistrationManager : IRegistrationService
     public void AccessNonExistentProperty()
     {
         var registration = new Registration();
-        var value = registration.NonExistentProperty;
+        //var value = registration.NonExistentProperty;
     }
 }

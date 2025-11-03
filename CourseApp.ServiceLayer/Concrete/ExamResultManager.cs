@@ -46,7 +46,7 @@ public class ExamResultManager : IExamResultService
         // ORTA: Null check eksik - entity null olabilir
         var addedExamResultMapping = _mapper.Map<ExamResult>(entity);
         // ORTA: Null reference - addedExamResultMapping null olabilir
-        var score = addedExamResultMapping.Score; // Null reference riski
+        //var score = addedExamResultMapping.Score; // Null reference riski
         
         await _unitOfWork.ExamResults.CreateAsync(addedExamResultMapping);
         // ZOR: Async/await anti-pattern - GetAwaiter().GetResult() deadlock'a sebep olabilir
@@ -56,7 +56,7 @@ public class ExamResultManager : IExamResultService
             return new SuccessResult(ConstantsMessages.ExamResultCreateSuccessMessage);
         }
         // KOLAY: Noktalı virgül eksikliği
-        return new ErrorResult(ConstantsMessages.ExamResultCreateFailedMessage) // TYPO: ; eksik
+        return new ErrorResult(ConstantsMessages.ExamResultCreateFailedMessage); // TYPO: ; eksik
     }
 
     public async Task<IResult> Remove(DeleteExamResultDto entity)
@@ -109,8 +109,8 @@ public class ExamResultManager : IExamResultService
         throw new NotImplementedException();
     }
 
-    private void CallMissingMethod()
-    {
-        MissingMethodHelper.Execute();
-    }
+    //private void CallMissingMethod()
+    //{
+    //   MissingMethodHelper.Execute();
+    //}
 }

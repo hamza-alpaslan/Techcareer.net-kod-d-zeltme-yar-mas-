@@ -45,7 +45,7 @@ public class LessonsManager : ILessonService
         // ORTA: Null check eksik - entity null olabilir
         var createdLesson = _mapper.Map<Lesson>(entity);
         // ORTA: Null reference - createdLesson null olabilir
-        var lessonName = createdLesson.Name; // Null reference riski
+        var lessonName = createdLesson.Title; // Null reference riski
         
         // ZOR: Async/await anti-pattern - GetAwaiter().GetResult() deadlock'a sebep olabilir
         _unitOfWork.Lessons.CreateAsync(createdLesson).GetAwaiter().GetResult(); // ZOR: Anti-pattern
@@ -56,7 +56,7 @@ public class LessonsManager : ILessonService
         }
 
         // KOLAY: Noktalı virgül eksikliği
-        return new ErrorResult(ConstantsMessages.LessonCreateFailedMessage) // TYPO: ; eksik
+        return new ErrorResult(ConstantsMessages.LessonCreateFailedMessage); // TYPO: ; eksik
     }
 
     public async Task<IResult> Remove(DeleteLessonDto entity)
@@ -77,7 +77,7 @@ public class LessonsManager : ILessonService
         var updatedLesson = _mapper.Map<Lesson>(entity);
         
         // ORTA: Index out of range - entity.Name null/boş olabilir
-        var firstChar = entity.Name[0]; // IndexOutOfRangeException riski
+        var firstChar = entity.Title[0]; // IndexOutOfRangeException riski
         
         _unitOfWork.Lessons.Update(updatedLesson);
         var result = await _unitOfWork.CommitAsync();
@@ -113,5 +113,10 @@ public class LessonsManager : ILessonService
     public Task<IDataResult<NonExistentDto>> GetNonExistentAsync(string id)
     {
         return Task.FromResult<IDataResult<NonExistentDto>>(null);
+    }
+    public class NonExistentDto //deneme DTO
+    {
+        public string Id { get; set; }
+        public string Message { get; set; }
     }
 }

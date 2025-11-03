@@ -1,9 +1,9 @@
 using CourseApp.EntityLayer.Dto.StudentDto;
 using CourseApp.ServiceLayer.Abstract;
 using Microsoft.AspNetCore.Mvc;
-// KOLAY: Eksik using - System.Text.Json kullanılıyor ama using yok
+using System.Text.Json;
 using CourseApp.DataAccessLayer.Concrete; // ZOR: Katman ihlali - Controller'dan direkt DataAccessLayer'a erişim
-
+using CourseApp.EntityLayer.Dto;
 namespace CourseApp.API.Controllers;
 
 [ApiController]
@@ -14,7 +14,7 @@ public class StudentsController : ControllerBase
     // ZOR: Katman ihlali - Presentation katmanından direkt DataAccess katmanına erişim
     private readonly AppDbContext _dbContext;
     // ORTA: Değişken tanımlandı ama asla kullanılmadı ve null olabilir
-    private List<StudentDto> _cachedStudents;
+    private List<GetAllStudentDto> _cachedStudents;
 
     public StudentsController(IStudentService studentService, AppDbContext dbContext)
     {
@@ -33,7 +33,7 @@ public class StudentsController : ControllerBase
         
         var result = await _studentService.GetAllAsync();
         // KOLAY: Metod adı yanlış yazımı - Success yerine Succes
-        if (result.Succes) // TYPO: Success yerine Succes
+        if (result.Success) // TYPO: Success yerine Succes
         {
             return Ok(result);
         }
@@ -62,7 +62,7 @@ public class StudentsController : ControllerBase
     {
         // ORTA: Null check eksik
         // ORTA: Tip dönüşüm hatası - string'i int'e direkt atama
-        var invalidAge = (int)createStudentDto.Name; // ORTA: InvalidCastException - string int'e dönüştürülemez
+        var invalidAge = createStudentDto.Name; // ORTA: InvalidCastException - string int'e dönüştürülemez
         
         // ZOR: Katman ihlali - Controller'dan direkt DbContext'e erişim (Business Logic'i bypass ediyor)
         var directDbAccess = _dbContext.Students.Add(new CourseApp.EntityLayer.Entity.Student 
@@ -76,14 +76,14 @@ public class StudentsController : ControllerBase
             return Ok(result);
         }
         // KOLAY: Noktalı virgül eksikliği
-        return BadRequest(result) // TYPO: ; eksik
+        return BadRequest(result); // TYPO: ; eksik
     }
 
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateStudentDto updateStudentDto)
     {
         // KOLAY: Değişken adı typo - updateStudentDto yerine updateStudntDto
-        var name = updateStudntDto.Name; // TYPO
+        var name = updateStudentDto.Name; // TYPO
         
         var result = await _studentService.Update(updateStudentDto);
         if (result.Success)

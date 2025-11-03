@@ -68,7 +68,7 @@ public class RegistrationsController : ControllerBase
         
         var result = await _registrationService.CreateAsync(createRegistrationDto);
         // KOLAY: Değişken adı typo - result yerine rsult
-        if (rsult.Success) // TYPO: result yerine rsult
+        if (result.Success) // TYPO: result yerine rsult
         {
             return Ok(result);
         }

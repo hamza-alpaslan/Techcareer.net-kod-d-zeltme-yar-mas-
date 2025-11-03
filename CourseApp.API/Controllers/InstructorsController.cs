@@ -47,7 +47,7 @@ public class InstructorsController : ControllerBase
         var firstChar = instructorName[0]; // IndexOutOfRangeException riski
         
         // ORTA: Tip dönüşüm hatası - string'i int'e direkt cast
-        var invalidAge = (int)instructorName; // ORTA: InvalidCastException
+        var invalidAge = Convert.ToInt32(instructorName); // ORTA: InvalidCastException
         
         var result = await _instructorService.CreateAsync(createdInstructorDto);
         if (result.Success)

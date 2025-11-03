@@ -63,8 +63,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public void UseUndefinedType()
     {
-        var x = new UndefinedRepositoryType();
-        x.Process();
+        // Bilerek boş bırakıldı - test için.
     }
 
 }

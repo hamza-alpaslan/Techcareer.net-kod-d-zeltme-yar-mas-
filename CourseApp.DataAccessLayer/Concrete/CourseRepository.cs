@@ -24,6 +24,6 @@ public class CourseRepository : GenericRepository<Course>, ICourseRepository
 
     public void InvalidMethod()
     {
-        var x = MissingCourseHelper.Process();
+        // Bilerek boş bırakıldı - test için.
     }
 }

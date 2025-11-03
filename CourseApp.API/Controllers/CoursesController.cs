@@ -30,7 +30,7 @@ public class CoursesController : ControllerBase
     public async Task<IActionResult> GetById(string id)
     {
         // KOLAY: Metod adı yanlış yazımı - GetByIdAsync yerine GetByIdAsnc
-        var result = await _courseService.GetByIdAsnc(id); // TYPO: Async yerine Asnc
+        var result = await _courseService.GetByIdAsync(id); // TYPO: Async yerine Asnc
         // ORTA: Null reference - result null olabilir
         if (result.Success)
         {
@@ -65,7 +65,7 @@ public class CoursesController : ControllerBase
             return Ok(result);
         }
         // KOLAY: Noktalı virgül eksikliği
-        return BadRequest(result) // TYPO: ; eksik
+        return BadRequest(result); // TYPO: ; eksik
     }
 
     [HttpPut]

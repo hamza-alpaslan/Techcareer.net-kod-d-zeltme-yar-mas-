@@ -22,4 +22,5 @@
     <ProjectReference Include="..\EntityLayer\CourseApp.EntityLayer.csproj" />
   </ItemGroup>
 
+
 </Project>

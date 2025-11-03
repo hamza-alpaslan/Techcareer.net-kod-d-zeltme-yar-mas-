@@ -18,6 +18,6 @@ public class LessonMapping:Profile
         CreateMap<Lesson,GetByIdLessonDetailDto>()
                 .ForMember(dst => dst.CourseName,opt => opt.MapFrom(src => src.Course!.CourseName))
                 .ReverseMap();
-        CreateMap<Lesson, NonExistentDtoType>();
+        //CreateMap<Lesson, NonExistentDtoType>();
     }
 }

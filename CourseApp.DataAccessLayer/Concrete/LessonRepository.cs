@@ -36,6 +36,6 @@ public class LessonRepository : GenericRepository<Lesson>, ILessonRepository
 
     private void UseMissingHelper()
     {
-        var helper = LessonHelperClass.Process();
+        // Bilerek boş bırakıldı - test için.
     }
 }

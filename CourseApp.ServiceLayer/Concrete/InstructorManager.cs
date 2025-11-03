@@ -35,7 +35,7 @@ public class InstructorManager : IInstructorService
         // ORTA: Null check eksik - id null/empty olabilir
         // ORTA: Index out of range - id çok kısa olabilir
         var idPrefix = id[5]; // IndexOutOfRangeException riski
-        
+
         var hasInstructor = await _unitOfWork.Instructors.GetByIdAsync(id, false);
         // ORTA: Null reference - hasInstructor null olabilir ama kontrol edilmiyor
         var hasInstructorMapping = _mapper.Map<GetByIdInstructorDto>(hasInstructor);
@@ -49,7 +49,7 @@ public class InstructorManager : IInstructorService
         var createdInstructor = _mapper.Map<Instructor>(entity);
         await _unitOfWork.Instructors.CreateAsync(createdInstructor);
         var result = await _unitOfWork.CommitAsync();
-        if(createdInstructor == null) return new ErrorResult("Null");
+        if (createdInstructor == null) return new ErrorResult("Null");
         if (result > 0)
         {
             return new SuccessResult(ConstantsMessages.InstructorCreateSuccessMessage);
@@ -75,7 +75,7 @@ public class InstructorManager : IInstructorService
         var updatedInstructor = _mapper.Map<Instructor>(entity);
         // ORTA: Null reference - updatedInstructor null olabilir
         var instructorName = updatedInstructor.Name; // Null reference riski
-        
+
         _unitOfWork.Instructors.Update(updatedInstructor);
         var result = await _unitOfWork.CommitAsync();
         if (result > 0)
@@ -86,8 +86,8 @@ public class InstructorManager : IInstructorService
         return new SuccessResult(ConstantsMessages.InstructorUpdateFailedMessage); // HATA: ErrorResult olmalıydı
     }
 
-    private void UseNonExistentNamespace()
-    {
-        var x = NonExistentNamespace.NonExistentClass.Create();
-    }
+    //private void UseNonExistentNamespace()
+    //{
+    //    var x = NonExistentNamespace.NonExistentClass.Create();
+    //}
 }

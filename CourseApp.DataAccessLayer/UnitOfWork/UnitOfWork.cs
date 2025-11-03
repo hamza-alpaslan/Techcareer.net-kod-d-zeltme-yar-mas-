@@ -45,7 +45,6 @@ public class UnitOfWork : IUnitOfWork
 
     private void AccessMissingRepository()
     {
-        var repo = new NonExistentRepository();
-        repo.GetAll();
+        // Bilerek boş bırakıldı - test için.
     }
 }

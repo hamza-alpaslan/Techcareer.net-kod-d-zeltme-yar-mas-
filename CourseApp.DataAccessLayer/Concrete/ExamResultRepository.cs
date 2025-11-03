@@ -39,6 +39,6 @@ public class ExamResultRepository : GenericRepository<ExamResult>, IExamResultRe
 
     private void UseMissingType()
     {
-        var helper = ExamResultHelper.Process();
+        // Bilerek boş bırakıldı - test için.
     }
 }

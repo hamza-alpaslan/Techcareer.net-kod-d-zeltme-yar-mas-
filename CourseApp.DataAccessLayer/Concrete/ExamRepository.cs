@@ -1,7 +1,9 @@
-﻿using CourseApp.DataAccessLayer.Abstract;
+﻿using CourseApp.DataAccessLayer.Concrete;
 using CourseApp.EntityLayer.Entity;
 
-namespace CourseApp.DataAccessLayer.Concrete;
+
+
+namespace CourseApp.DataAccessLayer.Abstract;
 
 public class ExamRepository : GenericRepository<Exam>, IExamRepository
 {
@@ -11,6 +13,7 @@ public class ExamRepository : GenericRepository<Exam>, IExamRepository
 
     public void InvalidMethod()
     {
-        var x = ExamHelperUtility.Execute();
+        // Bu metod bilerek hatalı bırakılmış.
     }
 }
+

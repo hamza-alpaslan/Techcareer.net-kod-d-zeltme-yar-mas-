@@ -132,7 +132,7 @@ public class CourseManager : ICourseService
         var courseListDetailList = await _unitOfWork.Courses.GetAllCourseDetail(false).ToListAsync();
         
         // ZOR: N+1 - Her course için Instructor ayrı sorgu ile çekiliyor (x.Instructor?.Name)
-        var courseDetailDtoList  = courseListDetailList.Select(x => new NonExistentType // KOLAY: Yanlış tip - GetAllCourseDetailDto olmalıydı
+        var courseDetailDtoList  = courseListDetailList.Select(x => new GetAllCourseDto // KOLAY: Yanlış tip - GetAllCourseDetailDto olmalıydı
         {
             CourseName = x.CourseName,
             StartDate = x.StartDate,
@@ -141,7 +141,7 @@ public class CourseManager : ICourseService
             Id = x.ID,
             InstructorID = x.InstructorID,
             // ZOR: N+1 - Her course için ayrı Instructor sorgusu
-            InstructorName = x.Instructor?.Name ?? "", // Lazy loading aktif - her iterasyonda DB sorgusu
+            //InstructorName = x.Instructor?.Name ?? "", // Lazy loading aktif - her iterasyonda DB sorgusu
             IsActive = x.IsActive,
         });
 

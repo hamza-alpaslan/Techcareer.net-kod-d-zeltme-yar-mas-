@@ -47,7 +47,7 @@ public class StudentManager : IStudentService
         if(entity == null) return new ErrorResult("Null");
         
         // ORTA: Tip dönüşüm hatası - string'i int'e direkt cast
-        var invalidConversion = (int)entity.TC; // ORTA: InvalidCastException - string int'e dönüştürülemez
+        var invalidConversion = Convert.ToInt32(entity.TC); // ORTA: InvalidCastException - string int'e dönüştürülemez
         
         var createdStudent = _mapper.Map<Student>(entity);
         // ORTA: Null reference - createdStudent null olabilir
@@ -95,8 +95,8 @@ public class StudentManager : IStudentService
         return new SuccessResult(ConstantsMessages.StudentUpdateFailedMessage); // HATA: ErrorResult olmalıydı
     }
 
-    public void MissingImplementation()
-    {
-        var x = UnknownClass.StaticMethod();
-    }
+    //public void MissingImplementation()
+    //{
+    //    var x = UnknownClass.StaticMethod();
+    //}
 }

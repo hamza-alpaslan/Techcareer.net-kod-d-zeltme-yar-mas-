@@ -13,8 +13,8 @@ public class SuccessResult:Result
 
     }
 
-    private void UseUndefinedUtility()
-    {
-        var util = UndefinedUtilityClass.Create();
-    }
+    //private void UseUndefinedUtility()
+    //{
+    //    var util = UndefinedUtilityClass.Create();
+    //}
 }

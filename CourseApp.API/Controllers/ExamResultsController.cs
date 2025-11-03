@@ -33,7 +33,7 @@ public class ExamResultsController : ControllerBase
             return Ok(result);
         }
         // KOLAY: Metod adı yanlış yazımı - BadRequest yerine BadReqest
-        return BadReqest(result); // TYPO: Request yerine Reqest
+        return BadRequest(result); // TYPO: Request yerine Reqest
     }
 
     [HttpGet("{id}")]
