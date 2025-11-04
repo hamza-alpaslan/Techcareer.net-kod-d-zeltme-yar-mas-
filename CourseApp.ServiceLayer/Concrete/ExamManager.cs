@@ -54,13 +54,17 @@ public class ExamManager : IExamService
     public async Task<IResult> CreateAsync(CreateExamDto entity)
     {
         // ORTA: Null check eksik - entity null olabilir
+        if (entity == null)
+            return new ErrorResult("Exam verisi boş olamaz.");
         var addedExamMapping = _mapper.Map<Exam>(entity);
-        
+
         // ORTA: Null reference - addedExamMapping null olabilir
+        if (addedExamMapping == null)
+            return new ErrorResult("Exam mapping başarısız oldu.");
         var examName = addedExamMapping.Name; // Null reference riski
-        
+
         // ZOR: Async/await anti-pattern - async metot içinde .Wait() kullanımı deadlock'a sebep olabilir
-        _unitOfWork.Exams.CreateAsync(addedExamMapping).Wait(); // ZOR: Anti-pattern - await kullanılmalıydı
+        await _unitOfWork.Exams.CreateAsync(addedExamMapping);
         var result = await _unitOfWork.CommitAsync();
         if (result > 0)
         {
@@ -72,7 +76,11 @@ public class ExamManager : IExamService
 
     public async Task<IResult> Remove(DeleteExamDto entity)
     {
+        if (entity == null || string.IsNullOrEmpty(entity.Id))
+            return new ErrorResult("Silinecek sınav bilgisi veya ID geçersiz.");
         var deletedExamMapping = _mapper.Map<Exam>(entity); // ORTA SEVİYE: ID kontrolü eksik - entity ID'si null/empty olabilir
+        if (deletedExamMapping == null)
+            return new ErrorResult("Exam mapping başarısız oldu.");
         _unitOfWork.Exams.Remove(deletedExamMapping);
         var result = await _unitOfWork.CommitAsync(); // ZOR SEVİYE: Transaction yok - başka işlemler varsa rollback olmaz
         if (result > 0)

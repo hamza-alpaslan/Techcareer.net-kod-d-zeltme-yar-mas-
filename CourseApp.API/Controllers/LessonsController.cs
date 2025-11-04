@@ -62,7 +62,17 @@ public class LessonsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateLessonDto createLessonDto)
     {
+
         // ORTA: Null check eksik - createLessonDto null olabilir
+        if (createLessonDto == null)
+        {
+            return BadRequest("Ders bilgileri gönderilmedi.");
+        }
+
+        if (string.IsNullOrWhiteSpace(createLessonDto.Title))
+        {
+            return BadRequest("Ders adı boş olamaz.");
+        }
         var lessonName = createLessonDto.Title; // Null reference riski
         
         // ORTA: Index out of range - lessonName boş/null ise

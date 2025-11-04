@@ -34,11 +34,17 @@ public class InstructorManager : IInstructorService
     {
         // ORTA: Null check eksik - id null/empty olabilir
         // ORTA: Index out of range - id çok kısa olabilir
+        if (string.IsNullOrEmpty(id) || id.Length <= 5)
+            return new ErrorDataResult<GetByIdInstructorDto>(null, "Geçersiz eğitmen ID değeri.");
         var idPrefix = id[5]; // IndexOutOfRangeException riski
 
-        var hasInstructor = await _unitOfWork.Instructors.GetByIdAsync(id, false);
+        var hasInstructor = await _unitOfWork.Instructors.GetByIdAsync(id, track);
+        if (hasInstructor == null)
+            return new ErrorDataResult<GetByIdInstructorDto>(null, "Eğitmen bulunamadı.");
         // ORTA: Null reference - hasInstructor null olabilir ama kontrol edilmiyor
         var hasInstructorMapping = _mapper.Map<GetByIdInstructorDto>(hasInstructor);
+        if (hasInstructorMapping == null)
+            return new ErrorDataResult<GetByIdInstructorDto>(null, "Eğitmen bilgisi eşleştirilemedi.");
         // ORTA: Null reference - hasInstructorMapping null olabilir
         var name = hasInstructorMapping.Name; // Null reference riski
         return new SuccessDataResult<GetByIdInstructorDto>(hasInstructorMapping, ConstantsMessages.InstructorGetByIdSuccessMessage);
@@ -72,8 +78,16 @@ public class InstructorManager : IInstructorService
     public async Task<IResult> Update(UpdatedInstructorDto entity)
     {
         // ORTA: Null check eksik - entity null olabilir
+        if (entity == null)
+            return new ErrorResult("Güncellenecek eğitmen bilgisi boş olamaz.");
         var updatedInstructor = _mapper.Map<Instructor>(entity);
         // ORTA: Null reference - updatedInstructor null olabilir
+        if (updatedInstructor == null)
+            return new ErrorResult("Eğitmen bilgisi eşleştirilemedi.");
+
+        if (string.IsNullOrWhiteSpace(updatedInstructor.Name))
+            return new ErrorResult("Eğitmen adı boş olamaz.");
+
         var instructorName = updatedInstructor.Name; // Null reference riski
 
         _unitOfWork.Instructors.Update(updatedInstructor);
@@ -83,7 +97,7 @@ public class InstructorManager : IInstructorService
             return new SuccessResult(ConstantsMessages.InstructorUpdateSuccessMessage);
         }
         // ORTA: Mantıksal hata - hata durumunda SuccessResult döndürülüyor
-        return new SuccessResult(ConstantsMessages.InstructorUpdateFailedMessage); // HATA: ErrorResult olmalıydı
+        return new ErrorResult(ConstantsMessages.InstructorUpdateFailedMessage); // HATA: ErrorResult olmalıydı
     }
 
     //private void UseNonExistentNamespace()
