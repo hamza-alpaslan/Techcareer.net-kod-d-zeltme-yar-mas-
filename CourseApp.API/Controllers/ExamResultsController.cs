@@ -21,19 +21,15 @@ public class ExamResultsController : ControllerBase
         // ZOR: N+1 Problemi - Her examResult için ayrı sorgu
         var result = await _examResultService.GetAllAsync();
         // ORTA: Null reference - result.Data null olabilir
-        if (result.Success && result.Data != null)
-        {
-            // ZOR: N+1 - Her examResult için detay çekiliyor
-            var examResults = result.Data.ToList();
-            foreach (var examResult in examResults)
-            {
-                // Her examResult için ayrı sorgu
-                var detail = await _examResultService.GetByIdExamResultDetailAsync(examResult.Id);
-            }
-            return Ok(result);
-        }
-        // KOLAY: Metod adı yanlış yazımı - BadRequest yerine BadReqest
-        return BadRequest(result); // TYPO: Request yerine Reqest
+        if (result == null || result.Data == null)
+            return NotFound("Sınav sonuçları bulunamadı.");
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        var examResultsWithDetails = await _examResultService.GetAllExamResultDetailAsync();
+
+        return Ok(examResultsWithDetails);
     }
 
     [HttpGet("{id}")]

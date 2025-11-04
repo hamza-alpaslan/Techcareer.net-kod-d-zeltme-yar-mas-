@@ -23,15 +23,22 @@ public class ExamManager : IExamService
     public async Task<IDataResult<IEnumerable<GetAllExamDto>>> GetAllAsync(bool track = true)
     {
         // ZOR: Async/await anti-pattern - async metot içinde senkron ToList kullanımı
-        var examList = _unitOfWork.Exams.GetAll(false).ToList(); // ZOR: ToListAsync kullanılmalıydı
+        var examList = await _unitOfWork.Exams.GetAll(track).ToListAsync(); // ZOR: ToListAsync kullanılmalıydı
         // KOLAY: Değişken adı typo - examtListMapping yerine examListMapping
-        var examtListMapping = _mapper.Map<IEnumerable<GetAllExamDto>>(examList); // TYPO
-        
+        var examListMapping = _mapper.Map<IEnumerable<GetAllExamDto>>(examList); // TYPO
+
         // ORTA: Index out of range - examtListMapping boş olabilir
-        var firstExam = examtListMapping.ToList()[0]; // IndexOutOfRangeException riski
-        
-        return new SuccessDataResult<IEnumerable<GetAllExamDto>>(examtListMapping, ConstantsMessages.ExamListSuccessMessage);
+        if (examListMapping == null || !examListMapping.Any())
+        {
+            return new ErrorDataResult<IEnumerable<GetAllExamDto>>(null, "Hiç sınav bulunamadı.");
+        } // IndexOutOfRangeException riski
+
+        // Örnek olarak ilk sınavı güvenli şekilde alma
+        var firstExam = examListMapping.FirstOrDefault();
+
+        return new SuccessDataResult<IEnumerable<GetAllExamDto>>(examListMapping, ConstantsMessages.ExamListSuccessMessage);
     }
+    
 
     //public void NonExistentMethod()
     //{

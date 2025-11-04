@@ -22,50 +22,79 @@ public class CourseManager : ICourseService
     public async Task<IDataResult<IEnumerable<GetAllCourseDto>>> GetAllAsync(bool track = true)
     {
         // ZOR: N+1 Problemi - Her course için Instructor ayrı sorgu ile çekiliyor
-        var courseList = await _unitOfWork.Courses.GetAll(false).ToListAsync();
-        
+        var courseList = await _unitOfWork.Courses
+    .GetAll(track)
+    .Include(c => c.Instructor)
+    .ToListAsync();
+
         // ZOR: N+1 - Include/ThenInclude kullanılmamış, lazy loading aktif
-        var result = courseList.Select(course => new GetAllCourseDto
-        {
-            CourseName = course.CourseName,
-            CreatedDate = course.CreatedDate,
-            EndDate = course.EndDate,
-            Id = course.ID,
-            InstructorID = course.InstructorID,
-            // ZOR: Her course için ayrı sorgu - course.Instructor?.Name çekiliyor
-            // ORTA: Null reference riski - course null olabilir
-            IsActive = course.IsActive,
-            StartDate = course.StartDate
-        }).ToList();
+        var result = courseList
+            .Where(course => course != null)
+            .Select(course => new GetAllCourseDto
+            {
+                Id = course.ID,
+                CourseName = course.CourseName,
+                CreatedDate = course.CreatedDate,
+                StartDate = course.StartDate,
+                EndDate = course.EndDate,
+                IsActive = course.IsActive,
+                InstructorID = course.InstructorID,
+            })
+            .ToList();
 
         // ORTA: Index out of range - result boş olabilir
-        var firstCourse = result[0]; // IndexOutOfRangeException riski
+        GetAllCourseDto firstCourse;
+        if (result != null && result.Any())
+        {
+            firstCourse = result[0];// IndexOutOfRangeException riski
+        }
+         
 
         return new SuccessDataResult<IEnumerable<GetAllCourseDto>>(result, ConstantsMessages.CourseListSuccessMessage);
     }
 
     public async Task<IDataResult<GetByIdCourseDto>> GetByIdAsync(string id, bool track = true)
     {
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            return new ErrorDataResult<GetByIdCourseDto>(
+                null,
+                "Geçersiz kurs ID'si. Lütfen doğru bir ID giriniz.");
+        }
         // ORTA: Null check eksik - id null/empty olabilir
         // ORTA: Null reference exception - hasCourse null olabilir ama kontrol edilmiyor
         var hasCourse = await _unitOfWork.Courses.GetByIdAsync(id, track);
-
+        if (hasCourse == null)
+        {
+            return new ErrorDataResult<GetByIdCourseDto>(
+                null,
+                "Belirtilen ID'ye sahip bir kurs bulunamadı.");
+        }
         // ORTA: Null reference - hasCourse null ise NullReferenceException
         var course = new GetByIdCourseDto
         {
-            CourseName = hasCourse.CourseName, // Null reference riski
+            Id = hasCourse.ID,
+            CourseName = hasCourse.CourseName,
             CreatedDate = hasCourse.CreatedDate,
-            EndDate = hasCourse.EndDate,
-            InstructorID = hasCourse.InstructorID,
-            IsActive = hasCourse.IsActive,
             StartDate = hasCourse.StartDate,
-            Id = hasCourse.ID
+            EndDate = hasCourse.EndDate,
+            IsActive = hasCourse.IsActive,
+            InstructorID = hasCourse.InstructorID
         };
 
-        return new SuccessDataResult<GetByIdCourseDto>(course, ConstantsMessages.CourseGetByIdSuccessMessage);
+        return new SuccessDataResult<GetByIdCourseDto>(
+            course,
+            ConstantsMessages.CourseGetByIdSuccessMessage);
     }
     public async Task<IResult> CreateAsync(CreateCourseDto entity)
     {
+        var instructor = await _unitOfWork.Instructors.GetByIdAsync(entity.InstructorID);
+        if (instructor == null)
+        {
+            return new ErrorDataResult<CreateCourseDto>(
+                null,
+                "Geçersiz InstructorID. Böyle bir eğitmen bulunamadı.");
+        }
         var createdCourse = new Course
         {
             CourseName = entity.CourseName,
@@ -129,24 +158,29 @@ public class CourseManager : ICourseService
     public async Task<IDataResult<IEnumerable<GetAllCourseDetailDto>>> GetAllCourseDetail(bool track = true)
     {
         // ZOR: N+1 Problemi - Include kullanılmamış, lazy loading aktif
-        var courseListDetailList = await _unitOfWork.Courses.GetAllCourseDetail(false).ToListAsync();
-        
+        var courseListDetailList = await _unitOfWork.Courses
+    .GetAllCourseDetail(track)
+    .Include(c => c.Instructor)
+    .ToListAsync();
+
         // ZOR: N+1 - Her course için Instructor ayrı sorgu ile çekiliyor (x.Instructor?.Name)
-        var courseDetailDtoList  = courseListDetailList.Select(x => new GetAllCourseDto // KOLAY: Yanlış tip - GetAllCourseDetailDto olmalıydı
-        {
-            CourseName = x.CourseName,
-            StartDate = x.StartDate,
-            EndDate = x.EndDate,
-            CreatedDate = x.CreatedDate,
-            Id = x.ID,
-            InstructorID = x.InstructorID,
-            // ZOR: N+1 - Her course için ayrı Instructor sorgusu
-            //InstructorName = x.Instructor?.Name ?? "", // Lazy loading aktif - her iterasyonda DB sorgusu
-            IsActive = x.IsActive,
-        });
+        var courseDetailDtoList = courseListDetailList
+            .Where(x => x != null)
+            .Select(x => new GetAllCourseDetailDto
+            {
+                Id = x.ID,
+                CourseName = x.CourseName,
+                StartDate = x.StartDate,
+                EndDate = x.EndDate,
+                CreatedDate = x.CreatedDate,
+                InstructorID = x.InstructorID,
+                InstructorName = x.Instructor?.Name ?? "Bilinmiyor",
+                IsActive = x.IsActive
+            })
+            .ToList();
 
         // ORTA: Null reference - courseDetailDtoList null olabilir
-        var firstDetail = courseDetailDtoList.First(); // Null/Empty durumunda exception
+        GetAllCourseDetailDto? firstDetail = courseDetailDtoList.FirstOrDefault(); // Null/Empty durumunda exception
 
         return new SuccessDataResult<IEnumerable<GetAllCourseDetailDto>>(courseDetailDtoList, ConstantsMessages.CourseDetailsFetchedSuccessfully);
     }
