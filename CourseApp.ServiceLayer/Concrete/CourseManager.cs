@@ -122,6 +122,11 @@ public class CourseManager : ICourseService
         {
             ID = entity.Id,
         };
+        var deletecousechech= await _unitOfWork.Courses.GetByIdAsync(entity.Id);
+        if (deletecousechech==null)
+        {
+            return new ErrorResult(ConstantsMessages.CourseDeleteFailedMessage);
+        }
         _unitOfWork.Courses.Remove(deletedCourse);
         var result = await _unitOfWork.CommitAsync();
         if (result > 0)
